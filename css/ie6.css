@@ -1,0 +1,39 @@
+/* CSS Document */
+#mapFormContainer label, #mapFormContainer input, #mapFormContainer .styledSelect {margin-right:15px;}
+input#searchSubmit {margin-left:0px;}
+.auth_panel_cont {overflow:hidden!important;}
+#auth {float:right!important; margin-top:-30px}
+#mapFormContainer {height:40px;}
+.g960, .column {overflow:hidden;}
+.tabs {width:950px;}
+.greyFilter {width:270px!important; overflow:hidden;}
+
+.list_style_corrector{width:507px; position:relative;}
+.list_style_corrector li {display:block; width:33%; float:left;}
+.list_style_corrector li ul li {width:100%}
+
+#addPhone {background:url(ie6/addphone.png) no-repeat;}
+#locationMapSwitch {background:url(ie6/globe.png) no-repeat;}
+.ez-checkbox, .ez-radio { zoom: 1; display:inline; height:22px; }
+.ie6_input_fixer {color:#2d4b4f; background:#f4f4f4; border-top:1px solid #c8c8c8; border-left:2px solid #e8e8e8; border-bottom:1px solid #f9f9f9; border-right:1px solid #f8f8f8;width:341px; padding:5px 7px 0px 7px; height:24px; margin-bottom:4px}
+.validationError {background: url(ie6/validation.png) no-repeat}
+
+#header {background:url(i/logo.png) no-repeat  0px 6px; behavior: url(/css/iepngfix.htc)}
+#header h1 a { display:block; height:102px; width:466px; } 
+
+#connection h3 {height:46px; border-bottom:1px solid #e8eeee; background:url(ie6/channels.png) no-repeat 20px 20px;}
+.styledSelect {z-index:10000!important;}
+
+#mapFormContainer {background:#FFF; border: 1px solid #d6dcdc; border-top:none!important; padding:12px 10px 12px 10px; color:#595959;}
+	#mapFormContainer input[type=text] {width:124px;color:#2d4b4f!important; background:#f4f4f4; border-top:1px solid #c8c8c8; border-left:2px solid #e8e8e8; border-bottom:1px solid #f9f9f9; border-right:1px solid #f8f8f8; padding:0px 3px 0px 3px; height:22px; margin-bottom:4px}
+	#mapFormContainer .styledSelect {float:left; background:#f4f4f4 url(i/nh_headings.png) no-repeat 7px -673px;color:#2d4b4f; border-top:1px solid #c8c8c8; border-left:2px solid #e8e8e8; border-bottom:1px solid #f9f9f9; border-right:1px solid #f8f8f8;width:124px; padding:0px 3px;cursor:pointer;height:22px;margin-bottom:4px;}
+		
+	#mapFormContainer label, #mapFormContainer input, #mapFormContainer .styledSelect {float:left; display:inline; margin-right:10px; margin-top:6px;}
+	#mapFormContainer label {padding-top:4px;}
+	input#searchSubmit {background:#228d9c; text-transform:uppercase; color:#FFF; padding:9px 18px; border-top:1px solid #66b0bb; border-right:1px solid #092327; border-bottom:1px solid #092327; border-left:1px solid #57a8b4; margin-top:-50px!important; float:right; margin-bottom:0px;}
+	input#searchSubmit:hover {background:#77aab0;border-top:1px solid #bfd7da; border-right:1px solid #374f51; border-bottom:1px solid #1e2b2c; border-left:1px solid #98bec3;}
+	.cancel {width:12px; height:12px; background:url(ie6/cancel_filter.png) no-repeat; cursor:pointer; float:right; margin-top:-50px;}
+/*USER PROFILE EDIT*/	
+#user_profile_edit_box_container #addPhone { top:-3px;}
+.removePhone { margin:0 0 0 -55px;}
+#user_profile_edit_box .ui-tabs-panel span { display:inline-block;}

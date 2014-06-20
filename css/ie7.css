@@ -1,0 +1,36 @@
+input#searchSubmit, input#addSubmit {background:#228d9c; text-transform:uppercase; color:#FFF; padding:9px 18px; border-top:1px solid #66b0bb; border-right:1px solid #092327; border-bottom:1px solid #092327; border-left:1px solid #57a8b4; margin-left:20px; margin-top:0px!important;}
+.tabs {width:950px;}
+
+.list_style_corrector{width:507px; position:relative;}
+.list_style_corrector li {display:block; width:33%; float:left;}
+.list_style_corrector li ul li {width:100%}
+
+input#addSubmit {display:block; float:left}
+
+div.jHtmlArea div { background:#f4f4f4;}
+div.jHtmlArea div iframe html { background:#f4f4f4;}
+/*USER PROFILE EDIT*/
+#user_profile_edit_box_container #addPhone { top:-3px;}
+.removePhone { margin:0 0 0 -55px;}
+
+/* CSS Document */
+
+input#searchSubmit, input#addSubmit {background:#228d9c; text-transform:uppercase; color:#FFF; padding:9px 18px; border-top:1px solid #66b0bb; border-right:1px solid #092327; border-bottom:1px solid #092327; border-left:1px solid #57a8b4; margin-left:20px; margin-top:0px!important;}
+.tabs {width:950px;}
+
+.list_style_corrector{width:507px; position:relative;}
+.list_style_corrector li {display:block; width:33%; float:left;}
+.list_style_corrector li ul li {width:100%}
+
+input#addSubmit {display:block; float:left}
+
+div.jHtmlArea div { background:#f4f4f4;}
+div.jHtmlArea div iframe html { background:#f4f4f4;}
+/*USER PROFILE EDIT*/
+#user_profile_edit_box_container #addPhone { top:-3px;}
+.removePhone { margin:0 0 0 -55px;}
+#user_profile_edit_box .ui-tabs-panel span { display:inline-block;}
+
+#avatar_image-circle {left:30px;}
+
+#auth { position: relative; right: -20px; top:-30px;}
