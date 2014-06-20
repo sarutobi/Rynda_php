@@ -66,7 +66,16 @@ class Rynda_Controller extends CI_Controller
                                     array($dbVersionUsed, $dbVersionRequired),
                                     $this->lang->line('pages_dbVersionOutOfDate')) );
         }
-        
+
+        $this->load->library('Ulogin',
+                             array('callback' => array('processToken',
+                                                       site_url('/auth/uLoginGetJs')),
+                                   'providers' => 'vkontakte,odnoklassniki,facebook,twitter',
+                                   'providers_h' => 'google,yandex,mailru,livejournal,openid',
+                                   'type' => 'panel',
+                                   'fields' => array('first_name', 'last_name', 'email',),
+                                   'fields_opt' => array('bdate', 'sex', 'photo_big',),));
+
         // Проверка существования текущего субдомена:
         $this->load->model('Subdomains_Model', 'subdomains', TRUE);
         if( !$this->subdomains->subdomainExists() )

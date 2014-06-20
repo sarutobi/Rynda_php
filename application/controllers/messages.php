@@ -30,7 +30,7 @@ class Messages extends Rynda_Controller
     {
         $this->load->model('Categories_Model', 'categories', TRUE);
         $this->load->model('Messages_Model', 'messages', TRUE);
-        
+
         $this->load->view('commonHeader',
                           array('showAuth' => TRUE,
                                 'user' => $this->_user,
@@ -69,13 +69,13 @@ class Messages extends Rynda_Controller
      * Страница добавления нового сообщения с просьбой помощи.
      */
     public function addRequest()
-    {   
+    {
         // Sometimes session ID is unset right after user logout. To fix it, refresh the page:
 //        if( !getSessionCookie() )
 //            header('Location: '.current_url());
 
         $this->load->model('Categories_Model', 'categories', TRUE);
-        
+
         $this->load->view('commonHeader',
                           array('showAuth' => TRUE,
                                 'user' => $this->_user,
@@ -119,7 +119,7 @@ class Messages extends Rynda_Controller
 //            header('Location: '.current_url());
 
         $this->load->model('Categories_Model', 'categories', TRUE);
-        
+
         $this->load->view('commonHeader',
                           array('showAuth' => TRUE,
                                 'user' => $this->_user,
@@ -181,9 +181,11 @@ class Messages extends Rynda_Controller
 
         $this->load->model('Messages_Model', 'messages', TRUE);
         $this->load->model('Media_Model', 'media', TRUE);
+        $this->load->model('Subscriber_Model', 'subscriber', TRUE);
 
         $message = $this->messages->getById($id);
-        
+
+
         if( !$message )
             show_error($this->lang->line('pages_messageNotFound'), 404);
         else if($message['subdomainName'] !== getSubdomain())
@@ -202,7 +204,7 @@ class Messages extends Rynda_Controller
             $categoryNames[] = $category['name'];
         }
         $message['statusName'] = $this->messages->getStatusName($message['statusId']);
-        
+
         $this->load->view('commonHeader',
                           array('showAuth' => TRUE,
                                 'user' => $this->_user,
@@ -219,12 +221,15 @@ class Messages extends Rynda_Controller
                                 'organizationTypes' => $this->organizations->getTypesList(),
                                 'showRequestButton' => TRUE,
                                 'showOfferButton' => TRUE,));
-        
         switch($message['typeSlug']) {
             case 'request':
                 $this->load->view('messagesDetailRequest',
                                   array('message' => $message,
                                         'photo' => $photo,
+                                        'isSubscribed' =>
+                                             $this->subscriber->isSubscribed(
+                                                     $this->_user? $this->_user->id: null,
+                                                     $message['id']),
                                         'advises' => $this->messages->getList(array('category' => $categoryIds,
                                                                                     'typeSlug' => 'advise',
                                                                                     'limit' => 4)),));
@@ -239,7 +244,8 @@ class Messages extends Rynda_Controller
                 break;
             case 'info':
                 $this->load->view('messagesDetailInfo', array('message' => $message,
-                                                              'photo' => $photo,));
+                                                              'photo' => $photo,
+                                                        ));
                 break;
             case 'advise':
                 $this->load->view('messagesDetailAdvise', array('message' => $message,
@@ -248,13 +254,14 @@ class Messages extends Rynda_Controller
             default:
                 show_error($this->lang->line('pages_messageTypeNotFound'), 404);
         }
-        
+
         $jsVars = array('CONST_COOKIE_DOMAIN' => $this->config->item('cookie_domain'),
                         'CONST_REGION_SERVICE_URL' => $this->config->item('region_geolocation_url'),
                         'VAR_MESSAGE_TYPE' => $message['typeSlug'],
                         'VAR_MESSAGE_ID' => $message['id'],
+                        'VAR_COMMENTS_EXPAND' => $this->input->get('expand')
                   );
-        
+
         $this->load->view('jsVars', array('jsVars' => $jsVars));
         $this->load->view('commonFooter');
     }
@@ -279,7 +286,7 @@ class Messages extends Rynda_Controller
 
         if( !$category ) // Категория не найдена
             show_error($this->lang->line('pages_categoryNotFound'), 404);
-        
+
         $this->load->view('commonHeader',
                           array('showAuth' => TRUE,
                                 'user' => $this->_user,
@@ -336,7 +343,7 @@ class Messages extends Rynda_Controller
 
         if( !$region ) // Регион не найден
             show_error($this->lang->line('pages_regionNotFound'), 404);
-        
+
         $this->load->view('commonHeader',
                           array('showAuth' => TRUE,
                                 'user' => $this->_user,
@@ -382,7 +389,7 @@ class Messages extends Rynda_Controller
     {
         $this->load->model('Categories_Model', 'categories', TRUE);
         $this->load->model('Messages_Model', 'messages', TRUE);
-        
+
         $this->load->view('commonHeader',
                           array('showAuth' => TRUE,
                                 'user' => $this->_user,

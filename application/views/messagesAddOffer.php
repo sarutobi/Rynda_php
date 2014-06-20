@@ -20,7 +20,7 @@
     	<div class="header_container rounded_top">
             <h2 class="no_text">Вы можете помочь?</h2>
         </div>
-		<div class="relative mt10 mb10">		
+		<div class="relative mt10 mb10">
 			<span class="attention">
 				Обратите внимание, что поля, помеченные знаком * обязательны для заполнения.
 			</span>
@@ -130,7 +130,7 @@
                            </div>
                            <!--<label for="locationAddress">Адрес:</label>-->
                            <input type="hidden" id="locationLatField" name="locationLat" value="" />
-                           <input type="hidden" id="locationLngField" name="locationLng" value="" />                   
+                           <input type="hidden" id="locationLngField" name="locationLng" value="" />
                            <br />
                            <br />
                            <strong>На каком расстоянии от дома вы можете помогать?</strong>
@@ -196,7 +196,7 @@
                              <div id="formResponseMessage"></div>
                             <img id="formResponseLoading" src="/images/loading.gif" alt="" style="display: none;" />
                             <div class="clearfix">&nbsp;</div>
-			</div>   
+			</div>
         </div>
                 <!-- Правая верхняя панель завершена -->
            	</div>
@@ -280,7 +280,7 @@
 				<a class="no_text" title="Хочу помочь" href="/pomogu/dobavit">Я хочу предложить свою помощь</a>
 			</div>
 		</div>
-        		
+
     </div>
 </script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js" type="text/javascript"></script>

@@ -13,17 +13,17 @@
  */
 
 /**
- * AJAX Upload ( http://valums.com/ajax-upload/ ) 
+ * AJAX Upload ( http://valums.com/ajax-upload/ )
  * Copyright (c) Andrew Valums
- * Licensed under the MIT license 
+ * Licensed under the MIT license
  */
 (function(){function d(a,b,c){if(a.addEventListener)a.addEventListener(b,c,!1);else if(a.attachEvent)a.attachEvent("on"+b,function(){c.call(a)});else throw Error("not supported or DOM not loaded");}function g(a,b){for(var c in b)b.hasOwnProperty(c)&&(a.style[c]=b[c])}function i(a,b){RegExp("\\b"+b+"\\b").test(a.className)||(a.className+=" "+b)}function f(a,b){a.className=a.className.replace(RegExp("\\b"+b+"\\b"),"")}function h(a){a.parentNode.removeChild(a)}var l=document.documentElement.getBoundingClientRect? function(a){var b=a.getBoundingClientRect(),c=a.ownerDocument,a=c.body,c=c.documentElement,j=c.clientTop||a.clientTop||0,d=c.clientLeft||a.clientLeft||0,e=1;a.getBoundingClientRect&&(e=a.getBoundingClientRect(),e=(e.right-e.left)/a.clientWidth);e>1&&(d=j=0);return{top:b.top/e+(window.pageYOffset||c&&c.scrollTop/e||a.scrollTop/e)-j,left:b.left/e+(window.pageXOffset||c&&c.scrollLeft/e||a.scrollLeft/e)-d}}:function(a){var b=0,c=0;do b+=a.offsetTop||0,c+=a.offsetLeft||0,a=a.offsetParent;while(a);return{left:c, top:b}},k=function(){var a=document.createElement("div");return function(b){a.innerHTML=b;return a.removeChild(a.firstChild)}}(),m=function(){var a=0;return function(){return"ValumsAjaxUpload"+a++}}();window.AjaxUpload=function(a,b){this._settings={action:"upload.php",name:"userfile",multiple:!1,data:{},autoSubmit:!0,responseType:!1,hoverClass:"hover",focusClass:"focus",disabledClass:"disabled",onChange:function(){},onSubmit:function(){},onComplete:function(){}};for(var c in b)b.hasOwnProperty(c)&& (this._settings[c]=b[c]);a.jquery?a=a[0]:typeof a=="string"&&(/^#.*/.test(a)&&(a=a.slice(1)),a=document.getElementById(a));if(!a||a.nodeType!==1)throw Error("Please make sure that you're passing a valid element");a.nodeName.toUpperCase()=="A"&&d(a,"click",function(a){if(a&&a.preventDefault)a.preventDefault();else if(window.event)window.event.returnValue=!1});this._button=a;this._input=null;this._disabled=!1;this.enable();this._rerouteClicks()};AjaxUpload.prototype={setData:function(a){this._settings.data= a},disable:function(){i(this._button,this._settings.disabledClass);this._disabled=!0;var a=this._button.nodeName.toUpperCase();(a=="INPUT"||a=="BUTTON")&&this._button.setAttribute("disabled","disabled");if(this._input&&this._input.parentNode)this._input.parentNode.style.visibility="hidden"},enable:function(){f(this._button,this._settings.disabledClass);this._button.removeAttribute("disabled");this._disabled=!1},_createInput:function(){var a=this,b=document.createElement("input");b.setAttribute("type", "file");b.setAttribute("name",this._settings.name);this._settings.multiple&&b.setAttribute("multiple","multiple");g(b,{position:"absolute",right:0,margin:0,padding:0,fontSize:"480px",fontFamily:"sans-serif",cursor:"pointer"});var c=document.createElement("div");g(c,{display:"block",position:"absolute",overflow:"hidden",margin:0,padding:0,opacity:0,direction:"ltr",zIndex:2147483583});if(c.style.opacity!=="0"){if(typeof c.filters=="undefined")throw Error("Opacity not supported by the browser");c.style.filter= "alpha(opacity=0)"}d(b,"change",function(){if(b&&b.value!==""){var c=b.value.replace(/.*(\/|\\)/,"");!1===a._settings.onChange.call(a,c,-1!==c.indexOf(".")?c.replace(/.*[.]/,""):"")?a._clearInput():a._settings.autoSubmit&&a.submit()}});d(b,"mouseover",function(){i(a._button,a._settings.hoverClass)});d(b,"mouseout",function(){f(a._button,a._settings.hoverClass);f(a._button,a._settings.focusClass);if(b.parentNode)b.parentNode.style.visibility="hidden"});d(b,"focus",function(){i(a._button,a._settings.focusClass)});d(b,"blur",function(){f(a._button,a._settings.focusClass)});c.appendChild(b);document.body.appendChild(c);this._input=b},_clearInput:function(){if(this._input)h(this._input.parentNode),this._input=null,this._createInput(),f(this._button,this._settings.hoverClass),f(this._button,this._settings.focusClass)},_rerouteClicks:function(){var a=this;d(a._button,"mouseover",function(){if(!a._disabled){a._input||a._createInput();var b=a._input.parentNode,c=a._button,d=l(c);g(b,{position:"absolute",left:d.left+ "px",top:d.top+"px",width:c.offsetWidth+"px",height:c.offsetHeight+"px"});b.style.visibility="visible"}})},_createIframe:function(){var a=m(),b=k('<iframe src="javascript:false;" name="'+a+'" />');b.setAttribute("id",a);b.style.display="none";document.body.appendChild(b);return b},_createForm:function(a){var b=this._settings,c=k('<form method="post" enctype="multipart/form-data"></form>');c.setAttribute("action",b.action);c.setAttribute("target",a.name);c.style.display="none";document.body.appendChild(c);for(var d in b.data)b.data.hasOwnProperty(d)&&(a=document.createElement("input"),a.setAttribute("type","hidden"),a.setAttribute("name",d),a.setAttribute("value",b.data[d]),c.appendChild(a));return c},_getResponse:function(a,b){var c=!1,f=this,g=this._settings;d(a,"load",function(){if(a.src=="javascript:'%3Chtml%3E%3C/html%3E';"||a.src=="javascript:'<html></html>';")c&&setTimeout(function(){h(a)},0);else{var e=a.contentDocument?a.contentDocument:window.frames[a.id].document;if(!(e.readyState&&e.readyState!= "complete")&&!(e.body&&e.body.innerHTML=="false")){var d;if(e.XMLDocument)d=e.XMLDocument;else if(e.body){if(d=e.body.innerHTML,g.responseType&&g.responseType.toLowerCase()=="json"){if(e.body.firstChild&&e.body.firstChild.nodeName.toUpperCase()=="PRE")e.normalize(),d=e.body.firstChild.firstChild.nodeValue;d=d?eval("("+d+")"):{}}}else d=e;g.onComplete.call(f,b,d);c=!0;a.src="javascript:'<html></html>';"}}})},submit:function(){var a=this._settings;if(this._input&&this._input.value!==""){var b=this._input.value.replace(/.*(\/|\\)/, "");if(!1===a.onSubmit.call(this,b,-1!==b.indexOf(".")?b.replace(/.*[.]/,""):""))this._clearInput();else{var a=this._createIframe(),c=this._createForm(a);h(this._input.parentNode);f(this._button,this._settings.hoverClass);f(this._button,this._settings.focusClass);c.appendChild(this._input);c.submit();h(c);h(this._input);this._input=null;this._getResponse(a,b);this._createInput()}}}}})();
 
 /**
- * HTML Clean for jQuery   
+ * HTML Clean for jQuery
  * Anthony Johnston
- * http://www.antix.co.uk    
- *   
+ * http://www.antix.co.uk
+ *
  * version 1.2.3
  *
  */
@@ -34,7 +34,7 @@
  * Собственный код страницы
  * ************************
  */
- 
+
  /**
  * Обновление всех фильтруемых данных на странице.
  * Примечание: эта функция имеет полиморфное поведение в зависимости от страницы.
@@ -192,7 +192,7 @@ function validateMessagesAdd($form)
             field.removeClass('invalidField');
             $('#emailError', $form).slideUp(250).html('');
         }
-        
+
         if( !phoneIsSet && !emailIsSet ) {
             $('#contactsError', $form)
                 .html(LANG_SOME_CONTACTS_REQUIRED)
@@ -228,6 +228,16 @@ function validateMessagesAdd($form)
         isFocused = true;
     }
 
+    // Координаты точки на карте (обязательно):
+    if( !$('#locationLatField', $form).val() || !$('#locationLngField', $form).val() ) {
+        $('#addressNotFound').addClass('invalidField');
+        result = result && false;
+    }
+    if( !result && !isFocused ) {
+        $('#locationMapSwitch').focus();
+        isFocused = true;
+    }
+
     field = $('#categoryListing');
     value = $('div.ez-checkbox.ez-checked', field);
     if(value.length <= 0) {
@@ -245,7 +255,7 @@ function validateMessagesAdd($form)
 
     if( !result )
         $('.width_fixer').animate({height: '740px'});
-      
+
     return result;
 }
 
@@ -288,7 +298,7 @@ function createMessageMarker(lat, lng, doGeocoding)
 //         console.log('Error', textStatus);
          $regionIdField.val('-');
      });
-    
+
     // Установка маркера:
     var markerLatLng = new google.maps.LatLng(lat, lng);
     marker = new google.maps.Marker({
@@ -307,7 +317,7 @@ function createMessageMarker(lat, lng, doGeocoding)
         $addressField.slideDown(200);
         $('#locationLatField', $form).val(newPosition.lat());
         $('#locationLngField', $form).val(newPosition.lng());
-        
+
         $('#locationCoords', $mapMessage).html(newPosition.lat()+', '+newPosition.lng());
 
         if( !$addressField.data('filledByUser') )
@@ -319,7 +329,7 @@ function createMessageMarker(lat, lng, doGeocoding)
     $addressField.slideDown(200);
     $('#locationLatField', $form).val(lat);
     $('#locationLngField', $form).val(lng);
-    
+
     $('#locationCoords', $mapMessage).html(lat.toFixed(2)+', '+lng.toFixed(2));
 
     if(doGeocoding)
@@ -512,14 +522,14 @@ $(function(){ // Готовность DOM
      * Начало применения кода для дизайна
      */
 	$('input:checkbox', $form).ezMark(); // Применение стилей к чекбоксам
-	
+
     // Уравниловка колонок:
     $('.column_container').css('height', Math.max($('#nh_1_column_container').height(),
                                                   $('#nh_2_column_container').height()));
     $('.column_container_offer').css('height', Math.max($('#ch_1_column_container').height(),
                                                         $('#ch_2_column_container').height()));
 
-    // Виз.редактор для текста сообщения:	
+    // Виз.редактор для текста сообщения:
     $('#messageText', $form).htmlarea({
 		css: '../css/jHtmlArea.Editor.css',
         toolbar: ['p', '|',
@@ -607,7 +617,7 @@ $(function(){ // Готовность DOM
 
         if( !$locationMap.data('windowOpened') ) { // Инициализировать карту
             $locationMap.data('windowOpened', true);
-            
+
             $(this).colorbox({inline: true,
                               href: $locationMap,
                               fixed: true,
@@ -712,7 +722,7 @@ $(function(){ // Готовность DOM
             });
 
             geocoder = new google.maps.Geocoder(); // Объект для геолокации гугла
-            
+
 //            mapIsInitialized = true;
         }
     });
@@ -724,7 +734,7 @@ $(function(){ // Готовность DOM
     /**
      * Конец карты для выбора координат
      */
-   
+
     // Кнопка "найти меня" в виджете карты для выбора координат:
     $('#locationMapLocateClient', '#locationMap').click(function(){
         /**
@@ -795,7 +805,7 @@ $(function(){ // Готовность DOM
 
     /**
      * Функции загрузки фоток и ссылок на видео.
-     * 
+     *
      * Всё, что ниже, полностью отлажено и работает. Просто в версию 1.0 проекта функция
      * загрузки фоток и видео не входит, так что поля убраны с формы до следующего этапа.
      */
@@ -959,16 +969,16 @@ $(function(){ // Готовность DOM
     // Отправка формы:
     $form.submit(function(e){
         e.preventDefault();
-       
-    //удаление из текста всех тэгов кроме CONST_ALLOWED_TAGS 
+
+    //удаление из текста всех тэгов кроме CONST_ALLOWED_TAGS
     var tags = [];
     $.each(JSON.parse(CONST_ALLOWED_TAGS), function(key, val){
       tags[key] = val.substr(1, val.length-2);
-    });        
+    });
     var textareaField = $('#messageText', $form);
-    var value = textareaField.htmlarea('toHtmlString');      
+    var value = textareaField.htmlarea('toHtmlString');
     var formatted = $.htmlClean(value,{allowedTags : tags});
-    $('#messageText').val(formatted);        
+    $('#messageText').val(formatted);
 
         if( !validateMessagesAdd($form) ) // Отменить сабмит, если валидация не пройдена
             return;
@@ -1017,7 +1027,7 @@ $(function(){ // Готовность DOM
                                   resp.message+
                                   '</div>').appendTo($submitMessageBlock).fadeIn(500);
                             } else {
-                                // Неизвестная ошибка на сервере. Параметры запроса занесены в лог. 
+                                // Неизвестная ошибка на сервере. Параметры запроса занесены в лог.
                                 // А нежную психику юзера мы будем беречь:
                                 $submitMessageBlock.fadeIn(500, function(){
                                     $('<div class="successMessageCustom" style="display: none;">'+

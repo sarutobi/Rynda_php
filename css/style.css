@@ -41,20 +41,27 @@ dl dd{margin-left:1.5em;}
 .vat {vertical-align: top;}
 .no_bg {background:none!important;}
 .no_text {text-indent:-9999px;}
-.no_display {display:none!important;}
+.no_display {display:none !important;}
+.block_display {display: block;}
 .no_list {list-style-type:none!important; margin:0px!important; padding:0px!important;}
 .nofloat {float: none !important;}
 .alignright {float:right;}
 .alignleft {float:left;}
 .floatleft li {float:left}
+.pt5 {padding-top: 5px !important;}
 .pt10 {padding-top: 10px !important;}
+.pt20 {padding-top: 20px !important;}
 .pb5 {padding-bottom: 5px !important;}
+.pb20 {padding-bottom: 20px !important;}
 .pl0 {padding-left:0px !important;}
+.pl5 {padding-left:5px !important;}
+.pl10 {padding-left: 10px !important;}
 .pl20 {padding-left: 20px!important;}
+.pa5 {padding:5px!important;}
 .pa20 {padding:20px!important;}
-.pr10 {padding-right:10px;}
-.pr15 {padding-right:15px;}
-.pr20 {padding-right:20px;}
+.pr10 {padding-right:10px !important;}
+.pr15 {padding-right:15px !important;}
+.pr20 {padding-right:20px !important;}
 .h150 {height:150px!important; overflow:hidden;}
 .h50 {height:50px!important; overflow:hidden;}
 .h75 {height:75px!important; overflow:hidden;}
@@ -64,10 +71,13 @@ dl dd{margin-left:1.5em;}
 .mb25 {margin-bottom:25px!important;}
 .mb35 {margin-bottom:35px!important;}
 .ml0 {margin-left:0px!important;}
+.ml5 {margin-left:5px!important;}
 .ml10 {margin-left:10px;}
 .ml20 {margin-left:20px!important;}
 .ml25 {margin-left:25px!important;}
 .ml40 {margin-left:40px !important;}
+.ml65 {margin-left:65px !important;}
+.ml280 {margin-left:280px !important;}
 .mr10 {margin-right:10px !important;}
 .ml64 {margin-left:64px;}
 .ml110 {margin-left:110px;}
@@ -89,6 +99,7 @@ a.orange:hover {color:#ff3400!important;}
 .all_caps {text-transform:uppercase;}
 .inline {display:inline;}
 .pointer {cursor:pointer!important;}
+.white {color: #FFFFFF;}
 .semiGrey {color: #58585A;}
 .darkGrey {color:#9c9c9c;}
 .dotted {border-bottom:1px dotted;}
@@ -98,9 +109,11 @@ a.orange:hover {color:#ff3400!important;}
 .shaddowGrey {-webkit-box-shadow: 0px 3px 7px 0px #8f8f8f; -moz-box-shadow: 0px 3px 7px 0px #8f8f8f; box-shadow: 0px 3px 7px 0px #8f8f8f;}
 .fs1e {font-size: 1em !important;}
 .fs1_2e {font-size: 1.2em !important;}
-.bgblue {background: #CEE0E4;}
-.bgwhite {background: #FFFFFF;}
-
+.bgblue {background: #CEE0E4 !important;}
+.bgwhite {background: #FFFFFF !important;}
+.bggrey {background: #EDEDED !important;}
+.bluebutton {background: #228D9D !important;}
+.greybutton {background: #666666 !important;}
 a:active, a:hover {outline: none;}
 
 .absolute {position: absolute;}
@@ -224,11 +237,11 @@ div.mapTabs ul.floatleft li a div {width: 50%; position: absolute; left: 25%;}
 	#nh_1_column h2, #nh_2_column h2, #ch_1_column h2, #ch_2_column h2, .needhelppage h2, .canhelppage h2 {height:50px; width:auto; background:url(i/nh_headings.png) no-repeat;
 		/*Border radius*/
 		-moz-border-radius-topleft: 5px;-moz-border-radius-topright: 5px;-moz-border-radius-bottomright: 0px;-moz-border-radius-bottomleft: 0px;border-top-left-radius: 5px;border-top-right-radius: 5px;border-bottom-right-radius: 0px;border-bottom-left-radius: 0px;behavior: url(/css/pie.htc); }
-		#nh_1_column h2, #nh1column h2 {background-position:0px 0px}
-		#nh_2_column h2 {background-position:0px -50px}
+		#nh_1_column h2, #nh1column h2 {background-position:0px 0px;}
+		#nh_2_column h2 {background-position:0px -50px;}
 		
-		#ch_1_column h2, .canhelppage h2 {background-position:0px -325px}
-		#ch_2_column h2 {background-position:0px -375px}
+		#ch_1_column h2, .canhelppage h2 {background-position: 0px -325px;}
+		#ch_2_column h2 {background-position:0px -375px;}
 	/* End of legacy version */	
 		.rounded_top {/*Border radius*/
 		-moz-border-radius-topleft: 5px;-moz-border-radius-topright: 5px;-moz-border-radius-bottomright: 0px;-moz-border-radius-bottomleft: 0px;border-top-left-radius: 5px;border-top-right-radius: 5px;border-bottom-right-radius: 0px;border-bottom-left-radius: 0px;behavior: url(/css/pie.htc); }
@@ -388,6 +401,7 @@ label.cat_label {float:left; display:block!important;margin-top:4px; margin-left
 .rynda_icon {background-position:-491px -100px; padding:2px 0px 3px 27px; font-weight:bold; }	
 	.blue_line {border-bottom:1px solid #e1eaea; margin:10px -20px 20px -20px;}
 	#photoload_container {display: block; position: relative; float: left;}
+	div#content.g960 div#formTotal form#mainForm div#nh1column.column div#nh_1_column_container.column_container div.jHtmlArea div iframe {width: 354px !important;}
 	
 	/*2.1.3 actual recommendations*/
 	#nh_actualRecommendations {background:#f6fcfc; border-top:1px solid #ccd1d1; border-left:1px solid #d9dede;-moz-border-radius-topleft: 5px;-moz-border-radius-topright: 5px;-moz-border-radius-bottomright: 0px;-moz-border-radius-bottomleft: 0px;border-top-left-radius: 5px;border-top-right-radius: 5px;border-bottom-right-radius: 0px;border-bottom-left-radius: 0px; }
@@ -504,7 +518,20 @@ box-shadow: -1px 1px 5px 0px #7a7a7a;}
 	div.commentBlock_textCol div.comment_mainText_Container div.comment_mainText ul, div.commentBlock_textCol div.comment_mainText_Container div.comment_mainText ol {position: relative; left: 30px;}
 	#loading { right: 300px; position: relative; bottom: 40px;}
 	.comment_mainText a {color: #518D2B;}
-	div.vm_categories {display: block; position: relative; float: left;}
+	#submitComments_container {display: block; float: none; margin: 5px 0;}
+	#submitComments_container a {color: #357B9A; font-weight: bold; cursor: pointer;}
+	#submitComments_enterEmail_Container {position: relative;}
+	#submitComments_enterEmail_panel {box-shadow: -1px 1px 5px 0 #7A7A7A; width: 250px; position: absolute; top: 8px; left: 35px; z-index: 15;}
+	#submitComments_enterEmail_header {height: 22px;}
+	#submitComments_enterEmail, #submitComments_enterName {width: 147px;}
+	#submitEmail-Button { width: 60px; text-align: center; cursor: pointer; float: left; left: 26px; position: relative;}
+	#submitEmail-Button:active {background: #CEE0E4 !important;}
+	#cancelEmail-Button {width: 60px !important; text-align: center; cursor: pointer; float: left; left: 30px; position: relative;}
+	#cancelEmail-Button:active {background: #B3B5B2 !important;}
+	#submitComments_do {cursor: pointer;}
+	#submitComments_enterEmail_panel div.pa20 div div {margin: 6px 5px 0 0; display: block; float: left; width: 35px; font-weight: bold;}
+	#submitComments_enterEmail_panel div.pa20 input {right: 0px;}
+	.submitComments_button_block {text-align: center;}
 	
 	
 	/* 2.3. Main Page */
@@ -902,7 +929,10 @@ input#searchSubmit:hover {background:#77aab0;border-top:1px solid #bfd7da; borde
 .login_box_login {background-position:0px 0px; width:251px;-moz-border-radius-topleft: 5px;-moz-border-radius-topright: 0px;-moz-border-radius-bottomright: 0px;-moz-border-radius-bottomleft: 0px;-webkit-border-radius: 5px 0px 0px 0px;border-radius: 5px 0px 0px 0px;}
 .login_box_registration {background-position:-251px 0px; width:189px;-moz-border-radius-topleft: 0px;-moz-border-radius-topright: 5px;-moz-border-radius-bottomright: 0px;-moz-border-radius-bottomleft: 0px;-webkit-border-radius: 0px 5px 0px 0px;border-radius: 0px 5px 0px 0px; display:block;}	
 .login_box_form_container {padding:33px 10px 33px 85px;}
-.reg_box_form_container {padding:23px 50px 50px;}
+.reg_box_form_container {padding:23px 50px 75px;}
+div#registerModal div.attention {margin-top: 5px;}
+#uLogin {display: block; float: left; margin-top: 5px; text-align: center; width: 450px;}
+form#regForm.registration div#uLogin {width: 350px;}
 
 /*If it is a registration box*/
 .login_box_registration_reg, .login_box_login_reg {height:49px; background:url(i/registration_header.png) no-repeat; text-indent:-9999px; float:left;}
@@ -942,7 +972,7 @@ form#regForm.registration div div.reg_error {left: -2px; top: -20px; position: r
 	#loginMessage {color: #060; position: absolute;}
 	#authModal #loginMessage { position: relative; width: 300px; font-size: 11px;}
 	#authModal #authmodal_button_panel {margin-top:9px; margin-bottom: 10px;}
-	#registerModal { margin: 20px 35px 40px;}
+	#registerModal { margin: 20px 35px 80px;}
 	#firstNameField, #lastNameField {border: 1px solid; border-color: #C8C8C8 #F8F8F8 #F9F9F9 #C8C8C8; height: 29px; width: 224px; right: 86px;}
 	#regSubmit {background:#228d9d; text-transform:uppercase; color:#FFF; border-top:1px solid #2f4d51; border-right:1px solid #51a5b1; border-bottom:1px solid #9fcdd4; border-left:1px solid #2f4d51; width:200px; margin-left: 68px; font-size: 12px; display: block; position: relative; float: left;}
 	/*body:nth-of-type(1) #regSubmit {padding: 0px;}*/
@@ -962,9 +992,11 @@ form#regForm.registration div div.reg_error {left: -2px; top: -20px; position: r
 	html body div#colorbox div#cboxWrapper div div#cboxContent div#cboxLoadedContent div#registerModal form#regForm div div#reg_mail_pass_container p input#passwordConfirmField.formField {top: 260px; position: absolute; right: 86px;}
 	html body div#colorbox div#cboxWrapper div div#cboxContent div#cboxLoadedContent div#registerModal form#regForm div div#reg_mail_pass_container p {margin: 28px 0;}
 	.validation_error {color: #DD4140 !important;}
-	#regMessage {position: absolute; bottom: 70px;}
+	#regMessage {position: absolute; bottom: 30px;}
 	#regMessage .errorMessage {position: absolute; text-align: center; width: 400px;} 
 	.successMessage {font-size: 11px; color: #79AA21; margin: -17px 0; padding: 8px; width: 400px;}
+	.reg_box_form_container form#regForm.registration #regMessage {bottom: -237px; padding: 0 !important;}
+	.reg_box_form_container form#regForm.registration #regMessage .errorMessage {width: 350px; padding: 0 !important;}
 	#forgotForm #loginField { width:239px;}
 	#forgotForm .successMessage { width:300px; position:relative; top:8px; left:-25px;}
 	#agreedError {position: relative; height: 20px;}

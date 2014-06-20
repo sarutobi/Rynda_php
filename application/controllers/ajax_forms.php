@@ -184,6 +184,62 @@ class Ajax_Forms extends Rynda_Controller
     }
 
     /**
+     * Обработка запроса на получение списка пользователей, соотв. указанным параметрам.
+     */
+    public function ajaxGetUsers()
+    {
+        $this->load->model('Users_Model', 'users', TRUE);
+
+        $filter = array('subdomain' => getSubdomain(), 'isPrivate' => 0);
+
+        if($this->input->post('category')) {
+            $filter['category'] = array();
+            foreach((array)$this->input->post('category') as $cat) {
+                if($cat)
+                    $filter['category'][] = (int)$cat;
+            }
+        }
+
+        if((int)$this->input->post('regionId') > 0)
+            $filter['regionId'] = (int)$this->input->post('regionId');
+
+        if($this->input->post('searchString'))
+            $filter['searchString'] = $this->input->post('searchString');
+        
+        if((int)$this->input->post('dateAddedFrom') > 0)
+            $filter['dateAddedFrom'] = (int)$this->input->post('dateAddedFrom');
+        
+        $itemsPerPage = (int)$this->input->post('itemsPerPage');
+        if($itemsPerPage) {
+            $currentPage = (int)$this->input->post('currentPage') ?
+                               (int)$this->input->post('currentPage') : 1;
+            $filter['limit'] = array(($currentPage-1)*$itemsPerPage,
+                                     $itemsPerPage);
+        }
+
+        $order = array();
+        $this->input->post('orderByDir') == 'asc' ? 'asc' : 'desc';
+        if($this->input->post('filterOrderBy') == 'dateAdded')
+            $order['dateAdded'] = $this->input->post('orderByDir') == 'asc' ? 'asc' : 'desc';
+        else {
+            $direction = $this->input->post('orderByDir') == 'asc' ? 'asc' : 'desc';
+            $order = array('firstName' => $direction,
+                           'lastName' => $direction,);
+        }
+
+        $users = $this->users->getList($filter, $order);
+        if($users !== FALSE) {
+            echo jsonResponse('success', '',
+                              array('data' => $users,
+                                    'totalDataCount' => $this->users->getCount($filter)));
+        } else {
+            echo jsonResponse('error', $this->users->getErrorMessages() ?
+                                           $this->users->getErrorMessages() :
+                                           $this->lang->line('forms_searchUsersError'));
+        }
+    }
+
+    /**
      * Обработка файла фотографии/аватарки, загруженной при редактировании параметров
      * аккаунта пользователя.
      */
@@ -591,6 +647,7 @@ class Ajax_Forms extends Rynda_Controller
     {
         $this->load->model('Messages_Model', 'messages', TRUE);
         $this->load->model('Locations_Model', 'locations', TRUE);
+       
 
         $this->load->library('email');
 
@@ -961,6 +1018,7 @@ class Ajax_Forms extends Rynda_Controller
     {
         $this->load->model('Comments_Model', 'comments', TRUE);
         $this->load->model('Users_Model', 'users', TRUE);
+        $this->load->model('Subscriber_Model', 'subscriber', TRUE);
         
         $arrayToSend = array(                              
             'messageId' => $this->input->post('messageId'), 
@@ -979,9 +1037,79 @@ class Ajax_Forms extends Rynda_Controller
         }
 
         echo $commentId = $this->comments->add($arrayToSend);
+        
+        //подписка на комменты
+        if($this->input->post('subscribe') && $commentId){
+            $email = $this->input->post('email')? $this->input->post('email'): '';
+            $userId = $this->input->post('userId')? $this->input->post('userId'): null;
+            $name = $this->input->post('userName')? $this->input->post('userName'): '';
+            echo $subscribeId = $this->subscriber->add(
+                      1,
+                      $this->input->post('parentId'),
+                      $email,
+                      $name,
+                      $userId
+            );          
+        }        
+        
+        //отправка уведомлений
+        if($commentId){
+          $list = $this->subscriber->getEmailList(
+                  $this->input->post('messageId'), 
+                  $this->input->post('parentId')
+          );
+          
+          $this->mailoutNewCommentNotice($list, $commentId, $this->input->post('messageId'));
+        }
       
     }
     
+    public function setStatusCommentProcess()    
+    {
+        $this->load->model('Comments_Model', 'comments', TRUE);
+        switch($this->input->post('action')) {
+            case 'delete':
+                $status = COMMENT_STATUS_DELETED;
+                break;
+            case 'spam':
+                $status = COMMENT_STATUS_SPAM;
+                break;
+            case 'del_by_moder':
+                $status = COMMENT_STATUS_DELETED_BY_MODER;
+                break;
+            default:
+                $status = false;
+        }
+        if($this->_checkStatusChangeAccess($status, $this->input->post('commentId'))){
+            $this->comments->setStatus((int)$this->input->post('commentId'), $status);
+        }
+    }  
+    
+    //можно ли данному юзеру изменить статус данного комментария. для защиты от удаления и прочих действий над 
+    //чужими комментами каких-нибудь умельцев
+    private function _checkStatusChangeAccess($statusId, $commentId)
+    {
+        if(!$statusId)
+            return false;
+        
+        //проверка на модератора
+        if(in_array($statusId, array(COMMENT_STATUS_SPAM, COMMENT_STATUS_DELETED_BY_MODER)) &&
+           $this->ion_auth->profile()->group != 'moder'){
+            return false;
+        }
+        
+        //проверка на принадлежность юзеру коммента
+        if($statusId != COMMENT_STATUS_DELETED){
+            $this->load->model('Comments_Model', 'comments', TRUE);
+            $comment = $this->comments->getbyId($commentId);
+            if($comment['userId'] != $this->ion_auth->profile()->id){
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
     public function countComments()
     {
         $this->load->model('Comments_Model', 'comments', TRUE);
@@ -1003,11 +1131,25 @@ class Ajax_Forms extends Rynda_Controller
     {
         $this->load->model('Comments_Model', 'comments', TRUE);
         $this->load->model('Users_Model', 'users', TRUE);
+        $this->load->model('Subscriber_Model', 'subscriber', TRUE);
         
         $list = $this->comments->getList(array('messageId' => $this->input->post('messageId'),
-                                               'statusId' => array(//COMMENT_STATUS_RECEIVED,
-                                                                   COMMENT_STATUS_MODERATED,)),
+                                               'statusId' => array(COMMENT_STATUS_RECEIVED,
+                                                                   COMMENT_STATUS_MODERATED,
+                                                                   COMMENT_STATUS_DELETED,
+                                                                   COMMENT_STATUS_SPAM,
+                                                                   COMMENT_STATUS_DELETED_BY_MODER)),
                                          array('depth' => 'desc', 'dateAdded' => 'asc'));
+        
+        //список подписок на комменты
+        $subscrIds = array();
+        if(isset($this->_user->id)){
+            $subscrList = $this->subscriber->getList(array('subscribe_type' => 1, 'user_id' => $this->_user->id));
+            foreach($subscrList as $subscr){
+                $subscrIds[] = $subscr->subscribe_to;
+            }
+        } 
+        
         // Формирование дерева комментариев:
         $tree = $list;
         foreach ($list as $key => $comment) {
@@ -1020,11 +1162,14 @@ class Ajax_Forms extends Rynda_Controller
             } else {
                 $tree[$key]['avatar_url'] = '/css/i/anonymous_thumb.png';
             }
-            //форматирование даты
-            $tree[$key]['dateAdded'] = date(
+            //форматирует дату
+            $tree[$key]['dateAdded'] = date( 
                     $this->config->item('comments_date_format'), 
                     $tree[$key]['dateAdded']
             );
+            
+            //помечаем комменты, на которые подписаны
+            $tree[$key]['isSubscribed'] = in_array($comment['id'], $subscrIds)? true: false;
 
             if($comment['parentId'] !=0 && isset($tree[ $comment['parentId'] ])) {
                 $tree[$comment['parentId']]['children'][] = $tree[$key];
@@ -1038,25 +1183,73 @@ class Ajax_Forms extends Rynda_Controller
         }   
 
         echo json_encode($clearTree);
-    }    
-    /**
-     * Отправка уведомления о поступлении нового коммента через систему Intense Debate.
-     * Временный метод (до реализации собственного модуля комментариев).
-     */
-//    public function mailoutNewCommentNotice()
-//    {
-//        $this->load->library('email');
-//
-//        $this->email->initialize(array('charset' => 'utf-8',
-//                                       'mailtype' => 'html',));
-//        $this->email->to('moderator@rynda.org');
-//        $this->email->from($this->config->item('admin_email'),
-//                           $this->config->item('project_basename'));
-//        $this->email->subject('Пришёл новый комментарий на rynda.org!');
-//        $this->email->message("Г-жи модераторы, пусть солнышко вам улыбается сегодня :)<br /><br />
-//                               На Рынде новый коммент, см. страницу ".$this->input->post('url').".<br /><br />
-//Искренне ваш,<br />
-//сайт ".site_url());    
-//        $this->email->send();
-//        }    
+    }  
+    
+    public function mailoutNewCommentNotice($list, $commentId, $messageId, $print = false)
+    {
+        $this->load->model('Messages_Model', 'messages', TRUE);
+        $this->load->model('Comments_Model', 'comments', TRUE);
+        $this->load->model('Users_Model', 'users', TRUE);
+        $this->load->library('email');
+        
+ 
+        
+        $comment = $this->comments->getById($commentId);
+        $message = $this->messages->getById($messageId);
+        $parentComment = $comment['parentId']? $this->comments->getById($comment['parentId']): 0;
+        //$commenter = $this->users->getMetaById($comment['userId']);
+        
+        foreach($list as $item){
+            $emailTemplateName = $item->subscribe_type? 'commentNewAnswer': 'messageNewComment';
+
+            if($print) {
+                /**
+                 * Режим для отладки шаблона письма (вывод шаблона в stdout).
+                 */
+                 $this->output->set_header('Content-type: text/html; charset=utf-8');
+                 $mailText = $this->load->view('email/'.$emailTemplateName, 
+                                             array('subscriber' => $item,
+                                                   'message' => $message,
+                                                   'comment' => $comment,
+                                                   'parentComment' => $parentComment
+                 ));                 
+                 
+            } else {
+              
+              $this->email->initialize(array('charset' => 'utf-8',
+                                       'mailtype' => 'html',));              
+              $this->email->to($item->email);
+              $this->email->from($this->config->item('mailout_email_from'),
+                                 $this->config->item('project_basename'));
+              $this->email->subject('новый ответ');   
+              //var_dump('email/'.$emailTemplateName);exit;
+              $mailText = $this->load->view('email/'.$emailTemplateName, 
+                                         array('subscriber' => $item,
+                                               'message' => $message,
+                                               'comment' => $comment,
+                                               'parentComment' => $parentComment
+                                             ), TRUE);
+                $this->email->message($mailText);               
+                $this->email->send();
+                $this->email->clear();                
+            }
+        }
+        
+        //письмо модератору
+        $this->email->initialize(array('charset' => 'utf-8',
+                                 'mailtype' => 'html',));  
+        $this->email->to($this->config->item('moderator_email'));
+        $this->email->from($this->config->item('mailout_email_from'),
+                           $this->config->item('project_basename'));
+        $this->email->subject('новый ответ');              
+        $mailText = $this->load->view('email/moderNewComment', 
+                                   array('message' => $message,
+                                         'comment' => $comment,
+                                         'parentComment' => $parentComment
+                                       ), TRUE);
+          $this->email->message($mailText);               
+          $this->email->send();
+          $this->email->clear();        
+    }
+    
 }

@@ -124,10 +124,11 @@
 					<div id="regMessage" class="login_box_message" style="display: none;"></div>
                     <input type="submit" id="regSubmit" value="ЗАРЕГИСТРИРОВАТЬСЯ" class="login_box_submit" />
                     <input tabindex="5" type="reset" id="regCancel" class="login_box_submit" value="ОТМЕНА" />
-                    <img id="formResponseLoading" src="/images/white_sm_loader.gif" style="display:none;" alt="" />
-                    
+                    <img id="regLoading" src="/images/white_sm_loader.gif" style="display:none;" alt="" />
+                <div class="attention">Обратите внимание, возможна регистрация через: <?php echo $this->ulogin->get_html();?></div>    
                 </div>
             </form>
+            
         </div>
     </div>
     <!-- Контент модального окна для регистрации - завершён -->

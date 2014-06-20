@@ -723,74 +723,6 @@ function refreshAll()
     $filterForm.submit();
 }
 
-$(document).delegate('#toggleMap', 'click', {}, function(e){
-    e.preventDefault();
-
-    var $this = $(this);
-    if( !$this.data('map-shown') ) { // Map were hidden, show it
-        $this.html('Скрыть карту');
-        $this.data('map-shown', 1);
-        $.cookie('ryndaorg_main_map_shown', 1);
-        $('#mapWithoutFilterForm').show();
-        google.maps.event.trigger(map, 'resize');
-
-        var $optionSelected = $regionFilterField.find('option:selected');
-        map.setCenter(new google.maps.LatLng($optionSelected.data('center-lat'),
-                                                $optionSelected.data('center-lng')));
-        map.setZoom($optionSelected.data('zoom-level'));
-    } else { // Map were shown, hide it
-        $this.html('Открыть карту');
-        $this.data('map-shown', 0);
-        $.cookie('ryndaorg_main_map_shown', 0);
-        $('#mapWithoutFilterForm').hide();
-    }
-});
-
-// Кнопка сброса полей формы на дефолтные значения:
-$filterForm.delegate('#reset', 'click', {}, function(){
-    $selectFields = $('select', $filterForm);
-    $selectFields.find('option:selected').each(function(){
-        $(this).removeAttr('selected');
-    });
-    $selectFields.find('option[value=""]').each(function(){
-        $(this).attr('selected', 'selected');
-    });
-
-    map.panTo(mapCenterLatLng);
-    $filterForm.submit();
-});
-
-// Перемещение карты к регионам при их изменении:
-$regionFilterField.delegate('', 'change', {}, function(){
-    var $optionSelected = $(this).find('option:selected');
-
-    map.panTo(new google.maps.LatLng($optionSelected.data('center-lat'),
-                                        $optionSelected.data('center-lng')));
-    map.setZoom($optionSelected.data('zoom-level'));
-//        refreshInfoBlocks();
-});
-
-$('#regionModal', '#auth').bind('regionChanged', function(e, newRegionId){
-    $regionFilterField.val(newRegionId);
-});
-
-// Отправка запроса при изменении любого поля формы фильтра:
-$filterForm.delegate(':input', 'change', {}, function(){
-    $filterForm.submit();
-});
-
-$filterForm.delegate('', 'submit', {}, function(e){
-    e.preventDefault();
-
-    $ajaxLoading.show();
-    formsEnabled(false);
-    $.when(refreshMessages(), refreshOrganizations(), refreshInfoBlocks())
-        .then(function(){
-            $ajaxLoading.hide();
-            formsEnabled(true);
-        });
-});
-
 $(function(){ // Готовность DOM
     // Карта:
     var mapTypeIds = [];
@@ -854,13 +786,64 @@ $(function(){ // Готовность DOM
          infoWindow.set('isOnCluster', true);
          infoWindow.open(map);
      });
-
+   
 //        google.maps.event.addListener(map, 'tilesloaded', function(){
 //            google.maps.event.trigger(map, 'resize');
 //            if(typeof userRegionCookie() != 'undefined' && !$regionFilterField.data('mapCentered')) {
 //                $regionFilterField.data('mapCentered', true).val(userRegionCookie()).change();
 //            }
 //        });
+    
+    // Кнопка сброса полей формы на дефолтные значения:
+    $('#reset', $filterForm).click(function(){
+        $selectFields = $('select', $filterForm);
+        $selectFields.find('option:selected').each(function(){
+            $(this).removeAttr('selected');
+        });
+        $selectFields.find('option[value=""]').each(function(){
+            $(this).attr('selected', 'selected');
+        });
+
+        map.panTo(mapCenterLatLng);
+        $filterForm.submit();
+    });
+
+    $('#toggleMap').click(function(e){
+        e.preventDefault();
+
+        var $this = $(this);
+        if( !$this.data('map-shown') ) { // Map were hidden, show it
+            $this.html('Скрыть карту');
+            $this.data('map-shown', 1);
+            $.cookie('ryndaorg_main_map_shown', 1);
+            $('#mapWithoutFilterForm').show();
+            google.maps.event.trigger(map, 'resize');
+            
+            var $optionSelected = $regionFilterField.find('option:selected');
+            map.setCenter(new google.maps.LatLng($optionSelected.data('center-lat'),
+                                                 $optionSelected.data('center-lng')));
+            map.setZoom($optionSelected.data('zoom-level'));
+        } else { // Map were shown, hide it
+            $this.html('Открыть карту');
+            $this.data('map-shown', 0);
+            $.cookie('ryndaorg_main_map_shown', 0);
+            $('#mapWithoutFilterForm').hide();
+        }
+    });
+
+    // Перемещение карты к регионам при их изменении:
+    $regionFilterField.change(function(){
+        var $optionSelected = $(this).find('option:selected');
+
+        map.panTo(new google.maps.LatLng($optionSelected.data('center-lat'),
+                                         $optionSelected.data('center-lng')));
+        map.setZoom($optionSelected.data('zoom-level'));
+//        refreshInfoBlocks();
+    });
+
+    $('#regionModal', '#auth').bind('regionChanged', function(e, newRegionId){
+        $regionFilterField.val(newRegionId);
+    });
 
     // Userlist widget:
     $('#usersList_leftCol').jCarouselLite({visible: 5,
@@ -876,6 +859,23 @@ $(function(){ // Готовность DOM
     
     // Компиляция jQuery-шаблона для блоков под картой:
     $('#messagesBlockTmpl').template('messagesBlockTmpl');
+    
+    // Отправка запроса при изменении любого поля формы фильтра:
+    $(':input', $filterForm).change(function(){
+        $filterForm.submit();
+    });
+
+    $filterForm.submit(function(e){
+        e.preventDefault();
+        
+        $ajaxLoading.show();
+        formsEnabled(false);
+        $.when(refreshMessages(), refreshOrganizations(), refreshInfoBlocks())
+         .then(function(){
+             $ajaxLoading.hide();
+             formsEnabled(true);
+         });
+    });
 
     // Виджет формы для управления маркерами сообщений и организаций:
     $(':input', $markerTypesForm).change(function(e){

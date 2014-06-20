@@ -98,3 +98,21 @@ function changeUrlSubdomain($newSubdomain, $url = NULL)
 //    echo '<pre>' . print_r($url, TRUE) . '</pre>';
     return $url;
 }
+
+/**
+ * Проверка, ведёт ли URL к файлу картинки.
+ * 
+ * @param $url
+ * @return boolean TRUE, если URL ведёт к картинке, иначе FALSE.
+ */
+function urlIsPicture($url)
+{
+    $url = trim($url);
+    if(empty($url))
+        return FALSE;
+    else
+        return strpos($url, 'jpg')
+            || strpos($url, 'jpeg')
+            || strpos($url, 'png')
+            || strpos($url, 'gif'); 
+}

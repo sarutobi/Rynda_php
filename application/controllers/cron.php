@@ -50,7 +50,7 @@ class Cron extends Rynda_Controller
             $haveMessagesToSend = FALSE;
             foreach($userRegions as &$region) {
                 $region['messages'] =
-                    $this->messages->getList(array('dateAddedFrom' => strtotime('-1 day'),
+                    $this->messages->getList(array('dateModifiedFrom' => strtotime('-1 day'),
                                                    'isActive' => TRUE,
                                                    'statusId' => array(MESSAGE_STATUS_MODERATED,
                                                                        MESSAGE_STATUS_VERIFIED,

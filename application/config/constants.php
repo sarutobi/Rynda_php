@@ -128,6 +128,7 @@ define('COMMENT_STATUS_DELETED_BY_MODER', 3);
  */
 define('COMMENT_STATUS_SPAM', 4);
 
+
 /**
  * Тип медиа - фотография
  */

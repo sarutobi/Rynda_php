@@ -293,7 +293,16 @@ class Auth extends Rynda_Controller
     {
         if($this->ion_auth->logged_in()) // Юзер уже аутентифицирован, вернуть на главную страницу
             redirect('/');
-        
+
+        $this->load->library('Ulogin',
+                             array('callback' => array('processToken',
+                                                       site_url('/auth/uLoginGetJs')),
+                                   'providers' => 'vkontakte,odnoklassniki,facebook,twitter',
+                                   'providers_h' => 'google,yandex,mailru,livejournal,openid',
+                                   'type' => 'panel',
+                                   'fields' => array('first_name', 'last_name', 'email',),
+                                   'fields_opt' => array('bdate', 'sex', 'photo_big',),));
+
         $this->load->view('commonHeader',
                           array('showAuth' => FALSE,
                                 'user' => $this->_user,
@@ -306,9 +315,6 @@ class Auth extends Rynda_Controller
                                 'showRequestButton' => TRUE,
                                 'showOfferButton' => TRUE,));
         $this->load->view('auth/register');
-        
-        $this->config->load('ion_auth', TRUE);
-        
 
         $jsVars = array('LANG_PASSWORD_SHORT' => $this->lang->line('auth_passwordTooShort'),
                         'LANG_PASSWORD_LONG' => $this->lang->line('auth_passwordTooLong'),
@@ -325,7 +331,31 @@ class Auth extends Rynda_Controller
         $this->load->view('jsVars', array('jsVars' => $jsVars));
         $this->load->view('commonFooter');
     }
-    
+
+    /**
+     * Вспомогательный метод для аяксового запроса виджета uLogin при регистрации через
+     * соцмедиа. Явно не вызывается - сам по себе бесполезен.
+     */
+    public function uLoginGetJs()
+    {
+        $this->load->view('auth/ulogin_xd');
+    }
+
+    /**
+     * Получение данных юзера от сервиса uLogin.
+     *
+     * @param $token string Хэш запроса данных пользователя у сервиса.
+     */
+    public function uLoginGetUserData()
+    {
+        $this->load->library('Ulogin',
+                             array('providers' => 'vkontakte,odnoklassniki,facebook,twitter',
+                                   'providers_h' => 'google,yandex,mailru,livejournal,openid',
+                                   'fields' => array('first_name', 'last_name', 'email',),
+                                   'fields_opt' => array('bdate', 'sex', 'photo_big',)));
+        die(jsonResponse('success', '', $this->ulogin->userdata()));
+    }
+
     /**
      * Обработка формы регистрации.
      */
@@ -345,17 +375,105 @@ class Auth extends Rynda_Controller
             else if( $this->ion_auth->email_check($this->input->post('loginField')) )
                 die( jsonResponse('error', $this->lang->line('auth_accountExists')) );
             else {
+                if($this->input->post('passwordField'))
+                    $password = $this->input->post('passwordField');
+                else {
+                    $this->load->helper('string');
+                    $password = random_string('alnum', 12);
+                    $passIsTmp = TRUE;
+                }
+
                 $user = $this->ion_auth->register('',
-                                                  $this->input->post('passwordField'),
+                                                  $password,
                                                   $this->input->post('loginField'),
                                                   array('first_name' =>
                                                             $this->input->post('firstNameField'),
                                                         'last_name' =>
                                                             $this->input->post('lastNameField')));
-
                 if( !$user )
                     die(jsonResponse('error', $this->lang->line('auth_registerError')));
                 else {
+                    $additionalData = array();
+                    if($this->input->post('birthDate'))
+                        $additionalData['birthday'] = $this->input->post('birthDate');
+                    if($this->input->post('gender'))
+                        $additionalData['gender'] = $this->input->post('gender');
+                    if($this->input->post('photoUrl')) {
+                        $avatar = file_get_contents($this->input->post('photoUrl'));
+                        if($avatar) {
+                            if( urlIsPicture($this->input->post('photoUrl')) )
+                                $filename = end(explode('/', parse_url($this->input->post('photoUrl'), PHP_URL_PATH)));
+                            else {
+                                $ch = curl_init($this->input->post('photoUrl'));
+                                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                                curl_exec($ch);
+                                if( !curl_errno($ch) )
+                                    $photoUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+                                $filename = end(explode('/', parse_url($photoUrl, PHP_URL_PATH)));
+                                curl_close($ch);
+                            }
+
+                            $fileExt = end(explode('.', $filename));
+                            $filename = sha1($filename.getSessionCookie());
+                            $mediaUrlPath = '/'.trim($this->config->item('avatar_path'), '/');
+                            $pictureFullPath = ABSOLUTE_PATH.$mediaUrlPath;
+
+                            file_put_contents($pictureFullPath.'/'.$filename.'.'.$fileExt, $avatar);
+
+                            $this->load->library('image_lib');
+
+                            // Ресайз картинки:
+                            $this->image_lib->initialize(array('image_library' => 'GD2',
+                                                               'source_image' => $pictureFullPath.'/'.$filename.'.'.$fileExt,
+                                                               'width' => $this->config->item('avatar_width'),
+                                                               'height' => $this->config->item('avatar_height'),));
+                            if ( !$this->image_lib->resize() ) {
+                                unlink($pictureFullPath.'/'.$filename.'.'.$fileExt);
+                                log_message('error', 'Error while postprocessing avatar picture. Message: '
+                                                    .$this->image_lib->display_errors('', ''));
+                            }
+                            $this->image_lib->clear();
+
+                            // Создание thumbnail-а картинки:
+                            $thumbnailFileName = "{$filename}_thumb.{$fileExt}";
+                            $thumbnailUrl = $mediaUrlPath.'/'.$thumbnailFileName;
+                            $this->image_lib->initialize(array('image_library' => 'GD2',
+                                                               'source_image' => $pictureFullPath
+                                                                                .'/'.$filename.'.'.$fileExt,
+                                                               'new_image' => $pictureFullPath
+                                                                             .'/'.$thumbnailFileName,
+                                                               'create_thumb' => TRUE,
+                                                               'thumb_marker' => '',
+                                                               'width' => 75,
+                                                               'height' => 50,
+                                                               'overwrite' => FALSE,));
+                            if( !$this->image_lib->resize() ) {
+                                unlink($pictureFullPath.'/'.$filename.'.'.$fileExt);
+                                log_message('error', 'Error while creating picture thumnail. Message: '
+                                                    .$this->image_lib->display_errors('', ''));
+                            }
+
+                            $pictureHash = sha1_file($pictureFullPath.'/'.$filename.'.'.$fileExt);
+                            $this->db->insert('multimedia', array('type' => MEDIA_IS_TYPE_AVATAR,
+                                                                  'uri' => $mediaUrlPath
+                                                                          .'/'.$filename.'.'
+                                                                          .$fileExt,
+                                                                  'thumb_uri' => $thumbnailUrl,
+                                                                  'checksum' => $pictureHash,));
+                            $pictureId = $this->db->insert_id();
+                            $this->db->trans_complete();
+
+                            if( !$this->db->trans_status() ) {
+                                log_message('error', 'Error while inserting picture in DB.');
+                                unlink($pictureFullPath.'/'.$filename.'.'.$fileExt);
+                            } else
+                                $additionalData['my_photo'] = $pictureId;
+                        }
+                    }
+
+                    if($additionalData)
+                        $this->db->update('users', $additionalData, array('id' => $user['id']));
                     // Email to tell the user to activate his account:
                     $this->email->clear();
                     $this->email->from($this->config->item('admin_email'),
@@ -364,13 +482,17 @@ class Auth extends Rynda_Controller
                     $this->email->subject('Ваша новая учётная запись на '
                                          .$this->config->item('base_url'));
                     $this->email->message($this->load->view('auth/email/activate',
-                                                            array('activation' =>
-                                                                      $user['activation'],
+                                                            array('password' => $password,
+                                                                  'passIsTmp' => !empty($passIsTmp),
+                                                                  'activation' => $user['activation'],
                                                                   'userId' => $user['id'],
                                                                   'userFirstName' =>
                                                                       $this->input->post('firstNameField'),),
                                                             TRUE));
-                    $this->email->send();
+                    if( !@$this->email->send() ) {
+                        log_message('error', 'Error sending new user activation email on: '
+                                            .$this->input->post('loginField'));                        
+                    }
 
                     die(jsonResponse('success',
                                     str_replace('%emailService',

@@ -92,7 +92,7 @@
 		<br />
 		<br />
         <span class="darkGrey fs10">
-            ${$item.formatDate(dateAdded)} | <a href="#" class="filterByRegion" data-region-id="${regionId}" title="Все сообщения по региону «${regionName}»">${regionName}</a>
+            ${$item.formatDate(dateAdded)} | <a href="/info/r/${regionId}" title="Все сообщения по региону «${regionName}»">${regionName}</a>
 <!--            {{if categories.length > 0}} | {{/if}}
             {{each categories}}
                 <a href="/info/c/${$value.id}" class="orange" title="Все сообщения категории «${$value.name}»">${$value.name}</a>{{if $index < $data.categories.length - 1}}, {{/if}}

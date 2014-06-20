@@ -259,6 +259,75 @@ function validateRegister($form, $message)
     return result;
 }
 
+/**
+ * Process the socmedia user token while registration with socnet account to get user
+ * socmedia info.
+ */
+function processToken(token)
+{
+    var $form = $('#regForm'),
+        $message = $('#regMessage', $form),
+        $ajaxLoading = $('#regLoading', $form);
+
+    $('#regSubmit', $form).attr('disabled', 'disabled').animate({opacity: 0.25});
+    $.getJSON('/auth/uLoginGetUserData/?token='+token)
+     .success(function(respUserData){
+         if(respUserData.status && respUserData.status == 'error') {
+             $message.html('<div class="errorMessage">Извините, кажется, мы не можем получить информацию из вашей соцсети :(\n\
+                            <br />Пжлст, зарегистрируйтесь с помощью формы выше</div>')
+                     .stop(true).fadeIn(200).fadeTo(5000, 1.0).fadeOut(200);
+             return;
+         }
+
+         $message.html('<div class="successMessage">Данные из выбранной соцсети успешно получены!\n\
+                        <br />Выполняется регистрация на сайте...</div>')
+                 .stop(true).fadeIn(200).fadeTo(5000, 1.0);
+         $ajaxLoading.show();
+         var userData = {loginField: respUserData.email,
+                         passwordField: 0,
+                         firstNameField: respUserData.first_name,
+                         lastNameField: respUserData.last_name};
+         if(respUserData.bdate) {
+             var birthDate = respUserData.bdate.split('.');
+             userData.birthDate = birthDate[2]+'-'+birthDate[1]+'-'+birthDate[0];
+         }
+         if(respUserData.photo_big)
+             userData.photoUrl = respUserData.photo_big;
+         if(respUserData.sex)
+             userData.gender = respUserData.sex == 2 ? 1 : 2;
+         else
+             userData.gender = 0;
+
+         $.post('/auth/registerProcess', userData)
+          .success(function(respRegister){
+              $('#regSubmit', $form).removeAttr('disabled').animate({opacity: 1.0});
+              $ajaxLoading.hide();
+              respRegister = $.parseJSON(respRegister);
+              if(respRegister.status && respRegister.status == 'error') {
+                  $message.html('<div class="errorMessage">Ошибка при регистрации. '
+                               +respRegister.message+'</div>')
+                          .stop(true).fadeIn(200).fadeTo(10000, 1.0).fadeOut(200);
+                  return;
+              } else {
+                  $message.html('<div class="successMessage">Регистрация успешна!\n\
+                                 <br /><br />На вашу почту отправлено письмо для активации вашей учётной записи.<br /><b><a href="http://'+respUserData.email.split('@')[1]+'">Проверить почту</a></b></div>')
+                          .stop(true).fadeIn(200).fadeTo(5000, 1.0);
+              }
+          })
+          .error(function(jqXHR, textStatus){
+              $('#regSubmit', $form).removeAttr('disabled').animate({opacity: 1.0});
+              $message.html('<div class="errorMessage">Ошибка при регистрации :(\n\
+                            <br />Пожалуйста, зарегистрируйтесь с помощью формы выше</div>')
+                      .stop(true).fadeIn(200).fadeTo(5000, 1.0).fadeOut(200);
+          });
+    })
+     .error(function(jqXHR, textStatus){
+         $('#regSubmit', $form).removeAttr('disabled').animate({opacity: 1.0});
+         $message.html('<div class="errorMessage">Ошибка при обработке!</div>')
+                 .stop(true).fadeIn(200).fadeTo(5000, 1.0).fadeOut(200);
+     });
+}
+
 $(function(){
     var $auth = $('#auth'), // Auth block
         $authLoading = $('img#authResponseLoading', $auth),

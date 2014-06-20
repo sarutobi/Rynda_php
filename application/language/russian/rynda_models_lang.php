@@ -37,4 +37,5 @@ $lang['modelMedia_errorMediaFileNotFound'] = '<b>Ошибка :(</b> Карти�
 $lang['modelMedia_errorMediaThumbNotFound'] = '<b>Ошибка :(</b> Картинки не существует';
 $lang['modelMedia_errorDeletingMediaFile'] = '<b>Ошибка :(</b> Невозможно удалить картинку';
 $lang['modelMedia_errorDeletingMediaThumb'] = '<b>Ошибка :(</b> Невозможно удалить картинку';
+$lang['modelSubscriber_errorNeedEmail_orUser_id'] = '<b>Ошибка :(</b> Авторизируйтесь, или укажите email адрес подписки';
 //$lang[''] = ;

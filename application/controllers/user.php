@@ -34,7 +34,8 @@ class User extends Rynda_Controller
     /**
      * Страница профиля пользователя.
      *
-     * @param $id integer ID учётной записи пользователя, чья страница выводится.
+     * @param bool|int $id integer ID учётной записи пользователя, чья страница выводится.
+     * @return void
      */
     public function personal($id = FALSE)
     {
@@ -119,7 +120,7 @@ class User extends Rynda_Controller
                                                       MESSAGE_STATUS_REACTION,
                                                   'CONST_MESSAGE_STATUS_REACTED' =>
                                                       MESSAGE_STATUS_REACTED,
-                                                  'CONST_MESSAGE_STATUS_CLOSED' => 
+                                                  'CONST_MESSAGE_STATUS_CLOSED' =>
                                                       MESSAGE_STATUS_CLOSED,
                                                   'LANG_MESSAGES_NOT_FOUND' =>
                                                       $this->lang->line('forms_searchMessagesNotFound'),
@@ -135,7 +136,8 @@ class User extends Rynda_Controller
     /**
      * Страница редактирования профиля пользователя.
      *
-     * @param $id integer ID учётной записи пользователя, чей профиль редактируется.
+     * @param bool|int $id integer ID учётной записи пользователя, чей профиль редактируется.
+     * @return void
      */
     public function edit($id = FALSE)
     {
@@ -228,7 +230,7 @@ class User extends Rynda_Controller
                                                       $this->lang->line('forms_lastNameRequired'),
                                                   'LANG_LAST_NAME_INVALID' =>
                                                       $this->lang->line('forms_lastNameInvalid'),
-                                                  'LANG_VP_TITLE_REQUIRED' => 
+                                                  'LANG_VP_TITLE_REQUIRED' =>
                                                       $this->lang->line('forms_vpTitleRequired'),
                                                   'LANG_PHONE_INVALID' =>
                                                       $this->lang->line('forms_phoneInvalid'),
@@ -266,6 +268,45 @@ class User extends Rynda_Controller
                                                       $this->lang->line('forms_aidingDistMaxLabel'),
                                                   'LANG_EDIT_PROFILE_SUCCESS' =>
                                                       $this->lang->line('forms_editVpSuccess'),)));
+        $this->load->view('commonFooter');
+    }
+
+    /**
+     * Страница списка пользователей системы.
+     */
+    public function all()
+    {
+        $this->load->model('Categories_Model', 'categories', TRUE);
+//        $this->load->model('Social_Net_Model', 'socNets', TRUE);
+//        $this->lang->load('rynda_views');
+        $this->load->view('commonHeader',
+            array('showAuth' => TRUE,
+                  'user' => $this->_user,
+                  'regions' => $this->regions->getList(),
+                  'userRegion' => $this->_userRegion,
+                  'subdomains' => $this->subdomains->getList(array('limit' => 15, 'status' => 1,)),
+                  'title' => 'Пользователи системы «'.$this->config->item('project_basename').'»',
+                  'organizationTypes' => $this->organizations->getTypesList(),
+                  'showRequestButton' => TRUE,
+                  'showOfferButton' => TRUE,));
+//        $socNetProfiles = array();
+//        foreach($this->socNets->getUserSocNetProfiles($user->id) as $socProfile) {
+//            $socNetProfiles[$socProfile['socNetId']] = $socProfile;
+//        }
+        $this->load->view('usersList', array('categories' => $this->categories->getChilds(),
+                                             'listTitleShort' => 'Пользователи',
+                                             'listTitle' => 'Пользователи системы',
+                                             'filterShowFields' => array('region', 'category', 'searchString'),));
+        $this->load->view('jsVars',
+                          array('jsVars' => array('LANG_USERS_NOT_FOUND' =>
+                                                      $this->lang->line('forms_searchUsersNotFound'),
+                                                  'CONST_COOKIE_DOMAIN' =>
+                                                      $this->config->item('cookie_domain'),
+                                                  'CONST_USER_REGION_ID' =>
+                                                      $this->input->cookie('ryndaorg_region'),
+                                                  'CONST_REGION_SERVICE_URL' =>
+                                                      $this->config->item('region_geolocation_url'),)));
+
         $this->load->view('commonFooter');
     }
 }

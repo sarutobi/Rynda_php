@@ -53,13 +53,17 @@
                 <div style="display:none;" class="validationError" id="agreedError"></div>
 				<br />
                 <input type="submit" class="nofloat login_box_submit" value="ЗАРЕГИСТРИРОВАТЬСЯ" id="regSubmit">
-                <img alt="Загружается..." id="regLoading" style="display:none;" src="/images/white_sm_loader.gif">
-            	<div style="display: none;" class="login_box_message" id="regMessage"></div>
+                <img alt="Загружается..." id="regLoading" style="position: absolute; bottom: -165px; display:none;" src="/images/white_sm_loader.gif">
+            	
 				<div class="tc mt10">
 					
 				</div>
+				<div class="attention">Обратите внимание, возможна регистрация через: 
+				<?php echo $this->ulogin->get_html();?></div>
+				<div style="display: none;" class="login_box_message" id="regMessage"></div>
             </div>
-        </form>		
+        </form>
+        
     </div>
 </div>        
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js" type="text/javascript"></script>

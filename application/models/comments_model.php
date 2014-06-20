@@ -368,4 +368,15 @@ class Comments_Model extends Rynda_Model
                 return FALSE;
         }
     }
+    
+    /**
+     * Изменения статуса
+     * 
+     * @param integer $commentId - id удаляемого комментария
+     */
+    public function setStatus($commentId, $statusId = COMMENT_STATUS_DELETED)
+    {
+        $this->db->where('id', $commentId);
+        return $this->db->update('comment', array('status' => $statusId)); 
+    }      
 }

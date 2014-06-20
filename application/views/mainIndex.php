@@ -70,7 +70,7 @@
                         <option value="0">Срочно</option>
                         <option value="1">Несрочно</option>
                     </select>
-                    <span id="toggleMap" style="border:1px solid black;margin-left:10px;padding:5px;font-size:15px;font-weight:bold;cursor:pointer;background-color:#bdd057;color:white;text-decoration-color:white;" data-map-shown="<?php echo $this->input->cookie('ryndaorg_main_map_shown') ? 1 : 0;?>">
+                    <span id="toggleMap" style="border:1px solid black;margin-left:10px;padding:5px;font-size:15px;font-weight:bold;cursor:pointer;background-color:#7EB32B;color:white;text-decoration-color:white;" data-map-shown="<?php echo $this->input->cookie('ryndaorg_main_map_shown') ? 1 : 0;?>">
                         <?php echo $this->input->cookie('ryndaorg_main_map_shown') ? 'Скрыть карту' : 'Открыть карту';?>
                     </span>
                     <img id="mapResponseLoading" src="/images/white_sm_loader.gif" alt="" style="display: none; margin:0px 0px 0px 5px;" />

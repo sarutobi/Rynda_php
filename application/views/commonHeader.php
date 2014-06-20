@@ -12,7 +12,6 @@
 <!DOCTYPE HTML>
 <html>
     <head>
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <?php if( !empty($keywords) ) {?>
         <meta name="keywords" content="<?php echo is_array($keywords) ? implode(',', $keywords) : trim($keywords);?>" />
@@ -57,6 +56,7 @@
     
 </head>
 <body>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
 
 <div class="auth_panel">
 	<div class="auth_panel_cont">
@@ -139,7 +139,7 @@
     </div>
 		<?php if( !empty($showAuth) )
             $this->load->view('widgets/auth', array('user' => $user,));
-    ?>
+        ?>
     </div>
 </div>
 <div id="navigation">
